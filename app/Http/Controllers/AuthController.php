@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use App\Utils\UniqueCodeGenerator;
+
 
 class AuthController extends Controller
 {
@@ -17,17 +19,22 @@ class AuthController extends Controller
             'password' => 'required|string|confirmed'
         ]);
 
+        $uniqueCode = UniqueCodeGenerator::generateUniqueCode();
+
         $user = User::create([
+            
             'name' => $fields['name'],
             'email' => $fields['email'],
-            'password' => $fields['password']
+            'password' => $fields['password'],
+            'unique_code' => $uniqueCode,
         ]);
 
         $token = $user->createToken('myapptoken')->plainTextToken;
 
         $response = [
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'uid' => $uniqueCode,
         ];
 
         return response($response, 201);
@@ -57,11 +64,14 @@ class AuthController extends Controller
             'token' => $token
         ];
 
-        return response($response, 201);
+        return response($response, 200);
     }
 
     public function logout(Request $request) {
-        auth()->user()->tokens()->delete();
+        // auth()->user()->tokens()->delete();
+        if (auth()->check()) {
+            auth()->user()->tokens()->delete();
+        }
 
         return [
             'message' => 'Logged out'
