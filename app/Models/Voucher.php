@@ -7,23 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class ShopModel extends Model
+class Voucher extends Model
 {
+
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name',
-        'description',
-        'logo_path',
+        'discount',
+        'total_used',
+        'max_voucher_used',
+        'shop_id',
+        'min_spend',
+        'expired_date',
+        't&c',
     ];
 
-    public function user()
+    public function shop()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Shops::class,'shop_id');
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\UploadedFile;
+use App\Models\Shops;
 
 class ShopController extends Controller
 {
@@ -12,7 +14,18 @@ class ShopController extends Controller
      */
     public function index()
     {
-        //
+        // Retrieve all shops
+        $shops = Shops::all();
+
+        // Check if there are any shops
+        if ($shops->isEmpty()) {
+            $response = [
+                'message' => 'No shops found',
+            ];
+            return response()->json($response, 404);
+        }
+        // If shops are found, return them as a response
+        return response()->json($shops, 200);
     }
 
     /**
@@ -23,16 +36,23 @@ class ShopController extends Controller
         $fields = $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',
-            'logo' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo' => 'image|mimes:jpeg,png,jpg',
         ]);
+
+        // Store the file in storage\app\public folder
+        $file = $request->file('logo');
+        $fileName = $file->getClientOriginalName();
+        $filePath = $file->store('uploads', 'public');
 
         $userId = Auth::id();
 
-        $shop = Shop::create([
+        $shop = Shops::create([
             'user_id' => $userId,
             'name' => $fields['name'],
-            'logo' => $fields['logo'],
-
+            'description' => $fields['description'],
+            'filename' => $fileName,
+            'original_name' => $file->getClientOriginalName(),
+            'file_path' => $filePath,
         ]);
 
         $response = [
