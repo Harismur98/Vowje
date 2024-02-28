@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('shop', function (Blueprint $table) {
+        Schema::table('shops', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('logo_path');
+            $table->text('filename');
+            $table->text('original_name');
+            $table->text('file_path');
         });
     }
 

@@ -15,6 +15,8 @@ return new class extends Migration
             $table->dropColumn('total_voucher');
             $table->dropColumn('total_need_to_collect');
             $table->integer('min_spend');
+            $table->integer('max_voucher_used');
+            $table->integer('total_used');
             $table->date('expired_date');
             $table->string('t&c', 200);
         });
