@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\ClaimController;
+use App\Http\Controllers\VendorAuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +26,9 @@ use App\Http\Controllers\ClaimController;
 //Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/vregister', [VendorAuthController::class, 'register']);
+Route::post('/vlogin', [VendorAuthController::class, 'login']);
 
 //Home
 Route::post('/addVoucher', [AuthController::class, 'addVoucher']);
