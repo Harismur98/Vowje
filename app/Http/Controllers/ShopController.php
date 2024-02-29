@@ -28,38 +28,46 @@ class ShopController extends Controller
         return response()->json($shops, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $fields = $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'logo' => 'image|mimes:jpeg,png,jpg',
-        ]);
-
-        // Store the file in storage\app\public folder
-        $file = $request->file('logo');
-        $fileName = $file->getClientOriginalName();
-        $filePath = $file->store('uploads', 'public');
-
         $userId = Auth::id();
 
-        $shop = Shops::create([
-            'user_id' => $userId,
-            'name' => $fields['name'],
-            'description' => $fields['description'],
-            'filename' => $fileName,
-            'original_name' => $file->getClientOriginalName(),
-            'file_path' => $filePath,
-        ]);
+        if(auth()->user()->role < 2 ){
 
-        $response = [
-            'message' => 'Successfully create shop',
-        ];
-
-        return response($response, 201);
+            $fields = $request->validate([
+                'name' => 'required|string',
+                'description' => 'required|string',
+                'logo' => 'image|mimes:jpeg,png,jpg',
+            ]);
+    
+            // Store the file in storage\app\public folder
+            $file = $request->file('logo');
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->store('uploads', 'public');
+    
+            $userId = Auth::id();
+    
+            $shop = Shops::create([
+                'user_id' => $userId,
+                'name' => $fields['name'],
+                'description' => $fields['description'],
+                'filename' => $fileName,
+                'original_name' => $file->getClientOriginalName(),
+                'file_path' => $filePath,
+            ]);
+    
+            $response = [
+                'message' => 'Successfully create shop',
+            ];
+    
+            return response($response, 201);
+        }
+        else{
+            $response = [
+                'message' => 'To register a shop please login using vendor account',
+            ];
+            return response($response, 401);    
+        }
     }
 
     /**
