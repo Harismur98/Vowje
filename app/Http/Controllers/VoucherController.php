@@ -28,6 +28,7 @@ class VoucherController extends Controller
             'min_spend' => 'required|integer',
             'expired_date' => 'required|date',
             't&c' => 'required|string',
+            'max_voucher_used' => 'required|integer',
         ]);
 
         $voucher = Voucher::create([
@@ -37,6 +38,7 @@ class VoucherController extends Controller
             'min_spend' => $fields['min_spend'],
             'expired_date' => $fields['expired_date'],
             't&c' => $fields['t&c'],
+            'max_voucher_used' => $fields['max_vohcer_used'],
         ]);
 
         $response = [

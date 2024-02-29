@@ -10,9 +10,9 @@ use Carbon\Carbon;
 
 class ClaimController extends Controller
 {
-    public function vclaim(Request $request)
+    public function vclaim($id)
 {
-    $voucher_id = $request->input('id');
+    $voucher_id = $id;
 
     // Retrieve the voucher based on the provided ID
     $voucher = Voucher::find($voucher_id);
@@ -24,9 +24,12 @@ class ClaimController extends Controller
 
     // Compare total_used and max_voucher_used
     if ($voucher->total_used < $voucher->max_voucher_used) {
+
         // Check if the voucher is expired
-        $expired_date = Carbon::createFromFormat('d/m/Y', $voucher->expired_date);
+        $expired_date = Carbon::parse($voucher->expired_date);
+
         if (!$expired_date->isPast()) {
+            
             // Voucher is not expired, save voucher ID to user_voucher table
             // Assuming you have a UserVoucher model and table
             $userVoucher = User_voucher::create([
