@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
 use App\Models\Shops;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class ShopController extends Controller
 {
@@ -40,6 +41,14 @@ class ShopController extends Controller
                 'description' => 'required|string',
                 'logo' => 'image|mimes:jpeg,png,jpg',
             ]);
+
+            // Validate the request
+            $validator = Validator::make($request->all(), $fields);
+
+            // Check if validation fails
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
     
             // Store the file in storage\app\public folder
             $file = $request->file('logo');
@@ -106,6 +115,14 @@ class ShopController extends Controller
             'description' => 'string',
             'logo' => 'image|mimes:jpeg,png,jpg',
         ]);
+
+        // Validate the request
+        $validator = Validator::make($request->all(), $fields);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
 
         // Update shop details
         $shop->name = $request['name'];

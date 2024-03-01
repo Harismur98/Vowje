@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stamps', function (Blueprint $table) {
-            $table->id();
-            $table->integer('count');
-            $table->timestamps();
+        Schema::table('stamps', function (Blueprint $table) {
+            $table->Integer('total_required_stamps');
         });
     }
 
@@ -23,6 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stamp');
+        //
     }
 };

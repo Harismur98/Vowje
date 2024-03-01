@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\StampController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\VendorAuthController;
 /*
@@ -41,6 +42,8 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::get('/claim/voucher/{id}', [ClaimController::class, 'vclaim']);
 
     Route::apiResource('/shop', ShopController::class);
+
+    Route::apiResource('/stamp', StampController::class);
 
     Route::apiResource('/voucher', VoucherController::class);
     
