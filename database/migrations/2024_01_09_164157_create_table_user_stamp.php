@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_stamp', function (Blueprint $table) {
+        Schema::create('user_stamps', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('stamp_id');
             $table->foreign('stamp_id')->references('id')->on('stamp');

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_voucher', function (Blueprint $table) {
+        Schema::create('user_vouchers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('voucher_id');
-            $table->foreign('voucher_id')->references('id')->on('stamp');
+            $table->foreign('voucher_id')->references('id')->on('voucher');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
