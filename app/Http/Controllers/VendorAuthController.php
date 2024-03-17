@@ -7,37 +7,46 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use App\Utils\UniqueCodeGenerator;
+use Illuminate\Support\Facades\Validator;
 
 class VendorAuthController extends Controller
 {
     public function register(Request $request){
-        $fields = $request->validate([
+        $rules = [
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed'
-        ]);
+        ];
+
+        // Validate the request
+        $validator = Validator::make($request->all(), $rules);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
 
         $uniqueCode = UniqueCodeGenerator::generateUniqueCode();
-
+        
         $user = User::create([
-            
-            'name' => $fields['name'],
-            'email' => $fields['email'],
-            'password' => $fields['password'],
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => $request['password'],
             'unique_code' => $uniqueCode,
             'role' => 1,
         ]);
-
+    
         $token = $user->createToken('myapptoken')->plainTextToken;
-
+    
         $response = [
             'user' => $user,
             'token' => $token,
             'uid' => $uniqueCode,
         ];
-
+    
         return response($response, 201);
     }
+    
 
     public function login(Request $request) {
         $fields = $request->validate([

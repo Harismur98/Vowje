@@ -14,7 +14,7 @@ class VoucherController extends Controller
      */
     public function index()
     {
-        $vouchers = Voucher::all();
+        $vouchers = Voucher::with('shop')->get();
         return response()->json(['data' => $vouchers], 200);
     }
 
@@ -23,7 +23,7 @@ class VoucherController extends Controller
      */
     public function store(Request $request)
     {
-        $fields = $request->validate([
+        $fields = [
             'discount' => 'required|decimal:2',
             'total_used' => 'required|integer',
             'shop_id' => 'required|integer',
@@ -31,7 +31,7 @@ class VoucherController extends Controller
             'expired_date' => 'required|date',
             't&c' => 'required|string',
             'max_voucher_used' => 'required|integer',
-        ]);
+        ];
 
         // Validate the request
         $validator = Validator::make($request->all(), $fields);
@@ -42,13 +42,13 @@ class VoucherController extends Controller
         }
 
         $voucher = Voucher::create([
-            'discount' => $fields['discount'],
-            'total_used' => $fields['total_used'],
-            'shop_id' => $fields['shop_id'],
-            'min_spend' => $fields['min_spend'],
-            'expired_date' => $fields['expired_date'],
-            't&c' => $fields['t&c'],
-            'max_voucher_used' => $fields['max_vohcer_used'],
+            'discount' => $request['discount'],
+            'total_used' => $request['total_used'],
+            'shop_id' => $request['shop_id'],
+            'min_spend' => $request['min_spend'],
+            'expired_date' => $request['expired_date'],
+            't&c' => $request['t&c'],
+            'max_voucher_used' => $request['max_voucher_used'],
         ]);
 
         $response = [

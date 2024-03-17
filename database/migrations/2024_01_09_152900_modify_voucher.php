@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('voucher', function (Blueprint $table) {
+        Schema::table('vouchers', function (Blueprint $table) {
             $table->dropColumn('total_voucher');
             $table->dropColumn('total_need_to_collect');
             $table->integer('min_spend');

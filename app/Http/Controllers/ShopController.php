@@ -36,11 +36,11 @@ class ShopController extends Controller
 
         if(auth()->user()->role < 2 ){
 
-            $fields = $request->validate([
+            $fields = [
                 'name' => 'required|string',
                 'description' => 'required|string',
                 'logo' => 'image|mimes:jpeg,png,jpg',
-            ]);
+            ];
 
             // Validate the request
             $validator = Validator::make($request->all(), $fields);
@@ -59,8 +59,8 @@ class ShopController extends Controller
     
             $shop = Shops::create([
                 'user_id' => $userId,
-                'name' => $fields['name'],
-                'description' => $fields['description'],
+                'name' => $request['name'],
+                'description' => $request['description'],
                 'filename' => $fileName,
                 'original_name' => $file->getClientOriginalName(),
                 'file_path' => $filePath,
