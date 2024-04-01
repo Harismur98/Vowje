@@ -9,6 +9,7 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\StampController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\VendorAuthController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -47,6 +48,8 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
 
     Route::apiResource('/voucher', VoucherController::class);
     
-    Route::apiResource('home', HomeController::class);
+    Route::apiResource('/home', HomeController::class);
+
+    Route::apiResource('/user', UserController::class);
 });
 

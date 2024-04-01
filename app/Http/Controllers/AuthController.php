@@ -16,7 +16,9 @@ class AuthController extends Controller
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|string|confirmed',
+            'gender' => 'required|string',
+            'birthdate' => 'required|date',
         ]);
 
         $uniqueCode = UniqueCodeGenerator::generateUniqueCode();
@@ -26,6 +28,8 @@ class AuthController extends Controller
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => $fields['password'],
+            'gender' => $fields['gender'],
+            'birthdate' => $fields['birthdate'],
             'unique_code' => $uniqueCode,
         ]);
 
