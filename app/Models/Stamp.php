@@ -13,7 +13,7 @@ class Stamp extends Model
 
     protected $fillable = [
         'reward',
-        'total_used',
+        'total_required_stamps',
         'max_stamp_used',
         'shop_id',
         'expired_date',
@@ -24,5 +24,9 @@ class Stamp extends Model
     public function shop()
     {
         return $this->belongsTo(Shops::class,'shop_id');
+    }
+    public function user_stamps()
+    {
+        return $this->hasMany(User_stamp::class);
     }
 }

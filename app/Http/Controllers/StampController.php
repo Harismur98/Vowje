@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Stamp;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User_stamp;
 use Illuminate\Support\Facades\Validator;
 
 class StampController extends Controller
@@ -13,8 +15,22 @@ class StampController extends Controller
      */
     public function index()
     {
-        $stamp = Stamp::all();
-        return response()->json(['data' => $stamp], 200);
+        $userId = Auth::id();
+        // Get stamps only for the specified user ID
+        $stamps = Stamp::whereHas('user_stamps', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->with(['user_stamps' => function ($query) use ($userId) {
+            $query->where('user_id', $userId)->select('stamp_id', 'collected_stamp');
+        }, 'shop'])->get();
+
+        // Transform the data to include collected_stamp for each stamp
+        // $stampData = $stamps->map(function ($stamp) {
+        //     $stampArray = $stamp->toArray();
+        //     $stampArray['collected_stamp'] = $stamp->user_stamps->pluck('collected_stamp')->toArray();
+        //     return $stampArray;
+        // });
+
+        return response()->json(['data' => $stamps], 200);
     }
 
     /**
@@ -24,7 +40,7 @@ class StampController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'reward' => 'required|string',
-            'total_used' => 'required|integer',
+            'total_required_stamps' => 'required|integer',
             'shop_id' => 'required|integer',
             'expired_date' => 'required|date',
             't&c' => 'required|string', 

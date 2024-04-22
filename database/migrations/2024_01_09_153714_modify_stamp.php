@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('shop_id');
             $table->foreign('shop_id')->references('id')->on('shop');
             $table->integer('max_stamp_used');
-            $table->integer('total_used');
+            $table->integer('total_required_stamps');
             $table->string('reward');
             $table->date('expired_date');
             $table->string('t&c', 200);

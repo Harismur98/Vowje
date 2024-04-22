@@ -7,22 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User_voucher extends Model
+class Stamp_points extends Model
 {
+
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
+        'stamp_id',
         'user_id',
-        'voucher_id',
+
     ];
-    
+
+    public function stamp()
+    {
+        return $this->belongsTo(Stamp::class,'stamp_id');
+    }
+
     public function user()
     {
-        return $this->belongsTo(User::class);
-    }
-    
-    public function voucher()
-    {
-        return $this->belongsTo(Voucher::class,'voucher_id'); // Assuming the model name is Voucher
+        return $this->belongsTo(User::class,'user_id');
     }
 }
