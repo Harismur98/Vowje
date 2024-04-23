@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('total_voucher');
             $table->integer('total_need_to_collect');
             $table->unsignedBigInteger('shop_id');
-            $table->foreign('shop_id')->references('id')->on('shop');
+            $table->foreign('shop_id')->references('id')->on('shops');
             $table->timestamps();
         });
     }
