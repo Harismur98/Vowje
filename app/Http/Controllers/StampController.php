@@ -17,11 +17,14 @@ class StampController extends Controller
     {
         $userId = Auth::id();
         // Get stamps only for the specified user ID
-        $stamps = Stamp::whereHas('user_stamps', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })->with(['user_stamps' => function ($query) use ($userId) {
+        $stamps = Stamp::leftJoin('user_stamps', function ($join) use ($userId) {
+            $join->on('stamps.id', '=', 'user_stamps.stamp_id')
+                 ->where('user_stamps.user_id', '=', $userId);
+        })
+        ->with(['user_stamps' => function ($query) use ($userId) {
             $query->where('user_id', $userId)->select('stamp_id', 'collected_stamp');
-        }, 'shop'])->get();
+        }, 'shop'])
+        ->get();
 
         // Transform the data to include collected_stamp for each stamp
         // $stampData = $stamps->map(function ($stamp) {
