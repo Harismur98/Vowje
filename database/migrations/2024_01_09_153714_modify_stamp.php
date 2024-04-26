@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('stamp', function (Blueprint $table) {
+        Schema::table('stamps', function (Blueprint $table) {
 
             $table->unsignedBigInteger('shop_id');
-            $table->foreign('shop_id')->references('id')->on('shop');
+            $table->foreign('shop_id')->references('id')->on('shops');
             $table->integer('max_stamp_used');
             $table->integer('total_required_stamps');
             $table->string('reward');
