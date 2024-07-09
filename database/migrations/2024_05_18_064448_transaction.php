@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('status');
             $table->string('payment_method');
             $table->string('description');
+            $table->string('transaction_type');
             $table->timestamps();
         });
     }

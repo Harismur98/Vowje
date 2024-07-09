@@ -17,5 +17,8 @@ class Credit extends Model
         return $this->belongsTo(Shops::class,'shop_id');
     }
 
+    public function transactions(){
+        return $this->hasMany(Transaction::class, 'credit_id');
+    }
     
 }

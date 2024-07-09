@@ -7,7 +7,8 @@ use App\Models\Stamp;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User_stamp;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\Shops;
+use App\Models\Twoin1Stamp;
 class StampController extends Controller
 {
     /**
@@ -41,27 +42,73 @@ class StampController extends Controller
      */
     public function store(Request $request)
     {
+
+        $userId = Auth::id();
+        // Get shop id from the shop table using user id
+        $shop = Shops::where('user_id', $userId)->first();
+
         $validator = Validator::make($request->all(), [
             'reward' => 'required|string',
             'total_required_stamps' => 'required|integer',
-            'shop_id' => 'required|integer',
             'expired_date' => 'required|date',
-            't&c' => 'required|string', 
+            'terms_and_condition' => 'required|string', 
             'max_stamp_used' => 'required|integer',
-            'total_required_stamps' => 'required|integer',
+            'second_total_required_stamps' => 'integer',
+            'second_rewards' => 'string',
         ]);
     
         if($validator->fails()){
             return response()->json(['error' => $validator->errors()], 400);
         }
-    
-        $stamp = Stamp::create($validator->validated());
-    
-        $response = [
-            'message' => 'Successfully create Stamp',
-        ];
-    
-        return response($response, 201);
+        
+        if($request->second_rewards != null){
+            $stamp = Stamp::create([
+                'reward' => $request->reward,
+                'total_required_stamps' => $request->total_required_stamps,
+                'expired_date' => $request->expired_date,
+                't&c' => $request->terms_and_condition,
+                'max_stamp_used' => $request->max_stamp_used,
+                'shop_id' => $shop->id
+            ]);
+
+            $stamp2 = Stamp::create([
+                'reward' => $request->second_rewards,
+                'total_required_stamps' => $request->second_total_required_stamps,
+                'expired_date' => $request->expired_date,
+                't&c' => $request->terms_and_condition,
+                'max_stamp_used' => $request->max_stamp_used,
+                'shop_id' => $shop->id
+            ]);
+
+            $twoinone = Twoin1Stamp::create([
+                'stamp_id' => $stamp->id,
+                'second_stamp_id' => $stamp2->id,
+                'is_2in1stamp' => 1
+            ]);
+
+            $response = [
+                'message' => 'Successfully create 2 Stamp',
+            ];
+        
+            return response($response, 201);
+
+        }
+        else{
+            $stamp = Stamp::create([
+                'reward' => $request->reward,
+                'total_required_stamps' => $request->total_required_stamps,
+                'expired_date' => $request->expired_date,
+                't&c' => $request->terms_and_condition,
+                'max_stamp_used' => $request->max_stamp_used,
+                'shop_id' => $shop->id
+            ]);
+
+            $response = [
+                'message' => 'Successfully create Stamp',
+            ];
+        
+            return response($response, 201);
+        } 
     }
 
 
@@ -120,5 +167,13 @@ class StampController extends Controller
         $stamp->delete();
 
         return response()->json(['message' => 'Stamp deleted successfully'], 200);
+    }
+
+    public function setStampStatus(Request $request){
+        $stamp = Stamp::findOrFail($request->id);
+
+        //update voucher is active
+        $stamp->is_active = $request->is_active;
+        $stamp->save();
     }
 }

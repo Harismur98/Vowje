@@ -10,6 +10,9 @@ use App\Http\Controllers\StampController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\VendorAuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Credits;
+use App\Http\Controllers\MerchentController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -40,17 +43,26 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/claim/voucher/{id}', [ClaimController::class, 'vclaim']);
-    Route::get('/claim/stampPoint/{id}', [ClaimController::class, 'pointCollection']);
+    Route::get('/claim/voucher/{id}/{userId}', [ClaimController::class, 'vclaim']);
+    Route::post('/claim/stampPoint/', [ClaimController::class, 'pointCollection']);
 
     Route::apiResource('/shop', ShopController::class);
 
     Route::apiResource('/stamp', StampController::class);
+    Route::post('/stamp/setstampstatus', [StampController::class, 'setStampStatus']);
 
     Route::apiResource('/voucher', VoucherController::class);
+    Route::post('/stamp/setvouchertatus', [VoucherController::class, 'setVoucherStatus']);
     
     Route::apiResource('/home', HomeController::class);
 
     Route::apiResource('/user', UserController::class);
+
+    Route::apiResource('/credit', Credits::class);
+
+    Route::apiResource('/merchant', MerchentController::class);
+    Route::get('/merchant/rewardviews/{id}', [MerchentController::class, 'rewardviews']);
+    Route::post('/merchant/stampsummary', [MerchentController::class, 'stampsummary']);
+    Route::post('/merchant/vouchersummary', [MerchentController::class, 'vouchersummary']);
 });
 

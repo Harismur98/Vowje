@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Shops;
 use App\Models\Voucher;
+use App\Models\Credit;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class VoucherController extends Controller
@@ -23,14 +26,18 @@ class VoucherController extends Controller
      */
     public function store(Request $request)
     {
+
+        $userId = Auth::id();
+        // Get shop id from the shop table using user id
+        $shop = Shops::where('user_id', $userId)->first();
+
         $fields = [
             'discount' => 'required|decimal:2',
-            'total_used' => 'required|integer',
-            'shop_id' => 'required|integer',
+            'total_used' => 'required|integer', //for chechking how many customers used this voucher
             'min_spend' => 'required|integer',
             'expired_date' => 'required|date',
             't&c' => 'required|string',
-            'max_voucher_used' => 'required|integer',
+            'max_voucher_used' => 'required|integer', // for limiting how many customers can use this voucher
         ];
 
         // Validate the request
@@ -41,10 +48,30 @@ class VoucherController extends Controller
             return response()->json(['error' => $validator->errors()], 400);
         }
 
+        //get credit amount from shop
+        $credit = Credit::where('shop_id', $shop->id)->first();
+        $Currentamount = $credit->credit;
+        $voucherAmount = $request->max_voucher_used * 0.2;
+
+        if ($Currentamount < $voucherAmount) {
+            return response()->json(['message' => 'Balance not enough. Please top up!!'], 400);
+        }
+        else{
+            $transaction = Transaction::create([
+                'credit_id' => $credit->id,
+                'amount' => $voucherAmount,
+                'transaction_type' => Transaction::TRANSACTION_TYPE_DEDUCT,
+                'status' => 'completed',
+                'payment_method' => 'credit',
+                'description' => "Created $request->max_voucher_used Voucher",
+            ]);
+            $transaction->processTransaction();
+        }        
+
         $voucher = Voucher::create([
             'discount' => $request['discount'],
             'total_used' => $request['total_used'],
-            'shop_id' => $request['shop_id'],
+            'shop_id' => $shop->id,
             'min_spend' => $request['min_spend'],
             'expired_date' => $request['expired_date'],
             't&c' => $request['t&c'],
@@ -113,5 +140,13 @@ class VoucherController extends Controller
         $voucher->delete();
 
         return response()->json(['message' => 'Voucher deleted successfully'], 200);
+    }
+
+    public function setVoucherStatus(Request $request){
+        $voucher = Voucher::findOrFail($request->id);
+
+        //update voucher is active
+        $voucher->is_active = $request->is_active;
+        $voucher->save();
     }
 }

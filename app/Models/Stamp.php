@@ -13,12 +13,12 @@ class Stamp extends Model
 
     protected $fillable = [
         'reward',
-        'total_required_stamps',
-        'max_stamp_used',
+        'total_required_stamps', //total number of stamp needed to claim
+        'max_stamp_used', // 
         'shop_id',
         'expired_date',
         't&c',
-        'total_required_stamps',
+        'is_active',
     ];
 
     public function shop()
