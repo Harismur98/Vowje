@@ -18,21 +18,23 @@ class StampController extends Controller
     {
         $userId = Auth::id();
         // Get stamps only for the specified user ID
+        // $stamps = Stamp::leftJoin('user_stamps', function ($join) use ($userId) {
+        //     $join->on('stamps.id', '=', 'user_stamps.stamp_id')
+        //          ->where('user_stamps.user_id', '=', $userId);
+        // })
+        // ->with(['user_stamps' => function ($query) use ($userId) {
+        //     $query->where('user_id', $userId)->select('stamp_id', 'collected_stamp');
+        // }, 'shop'])
+        // ->get();
+
         $stamps = Stamp::leftJoin('user_stamps', function ($join) use ($userId) {
             $join->on('stamps.id', '=', 'user_stamps.stamp_id')
                  ->where('user_stamps.user_id', '=', $userId);
         })
-        ->with(['user_stamps' => function ($query) use ($userId) {
-            $query->where('user_id', $userId)->select('stamp_id', 'collected_stamp');
-        }, 'shop'])
+        ->select('stamps.*', 'user_stamps.stamp_id', 'user_stamps.collected_stamp')
+        ->with(['shop'])
         ->get();
-
-        // Transform the data to include collected_stamp for each stamp
-        // $stampData = $stamps->map(function ($stamp) {
-        //     $stampArray = $stamp->toArray();
-        //     $stampArray['collected_stamp'] = $stamp->user_stamps->pluck('collected_stamp')->toArray();
-        //     return $stampArray;
-        // });
+    
 
         return response()->json(['data' => $stamps], 200);
     }

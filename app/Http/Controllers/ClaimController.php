@@ -17,6 +17,26 @@ use Illuminate\Support\Facades\Validator;
 
 class ClaimController extends Controller
 {
+    public function transactionProcess($total_required_stamp, $user_total_stamp, $new_total_stamp, $shopId) {
+        if($total_required_stamp >= $user_total_stamp){
+            $amount = 0.1 * $new_total_stamp;
+
+            //get credit id from credit table using shop id
+            $credit = Credit::where('shop_id', $shopId)->first();
+
+            //update transaction table for merchant
+            $transaction = Transaction::create([
+                'credit_id' => $credit->id,
+                'amount' => $amount,
+                'transaction_type' => Transaction::TRANSACTION_TYPE_DEDUCT,
+                'status' => 'completed',
+                'payment_method' => 'credit',
+                'description' => "Give $user_total_stamp Stamp point ", 
+            ]);
+
+            $transaction->processTransaction();
+        }
+    }
     public function vclaim($id, $userId)
     {
         $voucher_id = $id;
@@ -67,8 +87,8 @@ class ClaimController extends Controller
         $shop = Shops::where('user_id', $userId)->first();
 
         $fields = [
-            'user_id' => 'required',
-            'total_stamp' => 'required|integer', //for chechking how many customers used this voucher
+            'user_id' => 'required|integer',
+            'total_stamp' => 'required|integer', //for chechking how many merchant give point to requester
             'stamp_id' => 'required',
         ];
 
@@ -84,46 +104,37 @@ class ClaimController extends Controller
         $stamp = Stamp::where('id', $request->stamp_id)->first();
         $total_required_stamp = $stamp->total_required_stamps;
 
-        $user_stamp = User_stamp::where('user_id', $request->user_id)->first();
-        $user_total_stamp = $user_stamp->collected_stamp + $request->total_stamp;
+        $user_stamp = User_stamp::where('user_id', $request->user_id)
+                         ->where('stamp_id', $request->stamp_id)
+                         ->first();
+        
 
-        if($total_required_stamp >= $user_total_stamp){
-            $amount = 0.1 * $request->total_stamp;
-
-            //get credit id from credit table using shop id
-            $credit = Credit::where('shop_id', $shop->id)->first();
-
-            //update transaction table for merchant
-            $transaction = Transaction::create([
-                'credit_id' => $credit->id,
-                'amount' => $amount,
-                'transaction_type' => Transaction::TRANSACTION_TYPE_DEDUCT,
-                'status' => 'completed',
-                'payment_method' => 'credit',
-                'description' => "Give $user_total_stamp Stamp point ", 
+        if(!$user_stamp){
+            $this->transactionProcess($total_required_stamp, $request->total_stamp, $request->total_stamp, $shop->id);
+            $user_stamp = User_stamp::create([
+                'user_id' => $request->user_id,
+                'stamp_id' => $request->stamp_id,  
+                'collected_stamp' => $request->total_stamp
             ]);
 
-            $transaction->processTransaction();
-
-            //update user_stamp table. check if user already have stamp point for this stamp if not create
-            
-            if(!$user_stamp){
-                $user_stamp = User_stamp::create([
-                    'user_id' => $request->user_id,
-                    'stamp_id' => $request->stamp_id,
-                ]);
-            }
-            else{
-                //since the user already have stamp point add it to total collected
-                $user_stamp->collected_stamp = $user_total_stamp;
-                $user_stamp->save();
-            }
             return response()->json(['message' => 'Stamp point added successfully'], 200);
         }
         else{
-            return response()->json(['error' => "Stamp point exceeded max required $total_required_stamp"], 400);
+            //since the user already have stamp point add it to total collected
+            
+            
+
+            $user_total_stamp = $user_stamp->collected_stamp + $request->total_stamp;
+            $user_stamp->collected_stamp = $user_total_stamp;
+            $this->transactionProcess($total_required_stamp, $user_total_stamp, $request->total_stamp, $shop->id);
+            $user_stamp->save();
+
+            return response()->json(['message' => 'Stamp point added successfully'], 200);
         }
+
+        return response()->json(['error' => "Stamp point exceeded max required $total_required_stamp"], 400);
+
     }
     
-    
+
 }
