@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreign('stamp_id')->references('id')->on('stamps');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->integer('is_used')->default(0)->comment('0 - No, 1 - Yes');
             $table->integer('collected_stamp');
             $table->timestamps();
         });

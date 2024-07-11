@@ -17,7 +17,15 @@ class VoucherController extends Controller
      */
     public function index()
     {
-        $vouchers = Voucher::with('shop')->get();
+        $userId = Auth::id();
+        // Get vouchers only for voucher not in user_voucher.is_used = 1 and voucher.is_active = 1
+        $vouchers = Voucher::whereNotIn('id', function ($query) {
+            $query->select('voucher_id')
+                ->from('user_vouchers')
+                ->where('is_used', 1);
+        })
+        ->where('is_active', 1)
+        ->get();
         return response()->json(['data' => $vouchers], 200);
     }
 

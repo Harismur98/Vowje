@@ -44,6 +44,7 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/claim/voucher/{id}/{userId}', [ClaimController::class, 'vclaim']);
+    Route::get('/claim/stamp/{id}/{userId}', [ClaimController::class, 'sclaim']);
     Route::post('/claim/stampPoint/', [ClaimController::class, 'pointCollection']);
 
     Route::apiResource('/shop', ShopController::class);
