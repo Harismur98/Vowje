@@ -24,6 +24,13 @@ class MerchentController extends Controller
         $userName = $user->name;
         $unique_code = $user->unique_code;
         $shop = Shops::where('user_id', $userId)->first();
+
+        //if shop not found return 404 error
+        if (!$shop) {
+            return response()->json(['error' => 'Shop not found'], 404);
+
+        }
+
         $credit = Credit::where('shop_id', $shop->id)->first();
         //get transaction for current month
         $month = date('m');
@@ -91,6 +98,9 @@ class MerchentController extends Controller
     
         if (!$shop) {
             return response()->json(['error' => 'Shop not found'], 404);
+        }else{
+            $shop->full_image_url = url("storage/{$shop->file_path}");
+            $shop->thumbnail_url = url("storage/{$shop->file_path}?size=80x80");
         }
     
         $credit = Credit::where('shop_id', $shop->id)->first();

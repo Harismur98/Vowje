@@ -65,5 +65,10 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::get('/merchant/rewardviews/{id}', [MerchentController::class, 'rewardviews']);
     Route::post('/merchant/stampsummary', [MerchentController::class, 'stampsummary']);
     Route::post('/merchant/vouchersummary', [MerchentController::class, 'vouchersummary']);
+    
+    Route::post('/vchangepass', [VendorAuthController::class, 'changePassword']);
+
+    Route::get('/storage/{path}', [ImageController::class, 'serve'])
+    ->where('path', '.*');
 });
 

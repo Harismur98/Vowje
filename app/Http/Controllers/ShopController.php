@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
 use App\Models\Shops;
 use Illuminate\Http\JsonResponse;
+use App\Models\Credit;
 use Illuminate\Support\Facades\Validator;
 
 class ShopController extends Controller
@@ -64,6 +65,11 @@ class ShopController extends Controller
                 'filename' => $fileName,
                 'original_name' => $file->getClientOriginalName(),
                 'file_path' => $filePath,
+            ]);
+
+            $credit = Credit::create([
+                'shop_id' => $shop->id,
+                'credit' => 0.0,
             ]);
     
             $response = [

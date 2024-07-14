@@ -19,7 +19,7 @@ class VoucherController extends Controller
     {
         $userId = Auth::id();
         // Get vouchers only for voucher not in user_voucher.is_used = 1 and voucher.is_active = 1
-        $vouchers = Voucher::whereNotIn('id', function ($query) {
+        $vouchers = Voucher::with('shop')->whereNotIn('id', function ($query) {
             $query->select('voucher_id')
                 ->from('user_vouchers')
                 ->where('is_used', 1);

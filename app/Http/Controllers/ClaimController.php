@@ -48,6 +48,7 @@ class ClaimController extends Controller
 
         if (!$voucher) {
             // Handle the case where the voucher does not exist
+            Log::error("Voucher not found", ['voucher_id' => $voucher_id]);
             return response()->json(['error' => 'Voucher not found'], 404);
         }
 
@@ -58,7 +59,6 @@ class ClaimController extends Controller
             $expired_date = Carbon::parse($voucher->expired_date);
 
             if (!$expired_date->isPast()) {
-                
                 // Voucher is not expired, save voucher ID to user_voucher table
                 // Assuming you have a UserVoucher model and table
                 $userVoucher = User_voucher::create([
@@ -66,24 +66,32 @@ class ClaimController extends Controller
                     'voucher_id' => $voucher_id,
                     'is_used' => 1
                 ]);
-                $user = User::find('id', $userId);
+                
+                $user = User::find($userId);
+
                 $message = "$user->name get RM$voucher->discount discount";
                 $response = [
                     'message' => $message,
                     'voucher_id' => $voucher_id,
                 ];
 
+                // Log success message
+                Log::info("Voucher claimed successfully", ['user_id' => $userId, 'voucher_id' => $voucher_id]);
+
                 // Return a success response
                 return response()->json($response, 200);
             } else {
                 // Voucher is expired, return an error response
+                Log::warning("Voucher has expired", ['voucher_id' => $voucher_id]);
                 return response()->json(['error' => 'Voucher has expired'], 400);
             }
         } else {
             // total_used >= max_voucher_used, return an error response
+            Log::warning("Maximum voucher usage reached", ['voucher_id' => $voucher_id]);
             return response()->json(['error' => 'Maximum voucher usage reached'], 400);
         }
     }
+
 
     public function sclaim($id, $userId){
 
@@ -104,7 +112,8 @@ class ClaimController extends Controller
             $user_stamp->is_used = 1;
             $user_stamp->save();
 
-            $user = User::find('id', $userId);
+            $user = User::find($userId);
+
             $message = "$user->name have claimed $stamp->reward";
             $response = [
                 'message' => $message,
