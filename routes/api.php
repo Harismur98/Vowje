@@ -53,7 +53,7 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::post('/stamp/setstampstatus', [StampController::class, 'setStampStatus']);
 
     Route::apiResource('/voucher', VoucherController::class);
-    Route::post('/stamp/setvouchertatus', [VoucherController::class, 'setVoucherStatus']);
+    Route::post('/voucher/setvouchertatus', [VoucherController::class, 'setVoucherStatus']);
     
     Route::apiResource('/home', HomeController::class);
 
