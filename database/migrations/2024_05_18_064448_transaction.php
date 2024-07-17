@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('Transactions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('credit_id');
-            $table->foreign('credit_id')->references('id')->on('credits');
+            $table->foreign('credit_id')->references('id')->on('Credits');
             $table->float('amount');
             $table->string('status');
             $table->string('payment_method');
