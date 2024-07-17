@@ -15,7 +15,9 @@ class VendorAuthController extends Controller
         $rules = [
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|string|confirmed',
+            'gender' => 'required|string',
+            'birthdate' => 'required|date',
         ];
 
         // Validate the request
@@ -32,6 +34,8 @@ class VendorAuthController extends Controller
             'name' => $request['name'],
             'email' => $request['email'],
             'password' => $request['password'],
+            'gender' => $request['gender'],
+            'birthdate' => $request['birthdate'],
             'unique_code' => $uniqueCode,
             'role' => 1,
         ]);
@@ -84,5 +88,26 @@ class VendorAuthController extends Controller
         return [
             'message' => 'Logged out'
         ];
+    }
+
+    public function changePassword(Request $request) {
+        $fields = $request->validate([
+            'old_password' => 'required|string',
+            'new_password' => 'required|string|confirmed'
+        ]);
+
+        $user = auth()->user();
+        if (!Hash::check($fields['old_password'], $user->password)) {
+            return response([
+                'message' => 'Wrong password'
+            ], 401);
+        }
+
+        $user->password = bcrypt($fields['new_password']);
+        $user->save();
+        
+        return response([
+            'message' => 'Password changed'
+        ], 200);
     }
 }

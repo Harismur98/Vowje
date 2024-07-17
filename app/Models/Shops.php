@@ -23,10 +23,12 @@ class Shops extends Model
         'filename',
         'original_name',
         'user_id',
+        'credit_limit',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class,'user_id');
     }
+
 }

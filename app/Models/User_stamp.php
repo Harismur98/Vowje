@@ -15,6 +15,7 @@ class User_stamp extends Model
         'user_id',
         'stamp_id',
         'collected_stamp',
+        'is_used',
     ];
 
     public function user()

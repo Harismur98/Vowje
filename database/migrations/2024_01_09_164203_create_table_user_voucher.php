@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreign('voucher_id')->references('id')->on('vouchers');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->integer('is_used')->default(0)->comment('0 - No, 1 - Yes');
             $table->timestamps();
         });
     }

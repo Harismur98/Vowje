@@ -20,6 +20,7 @@ class Voucher extends Model
         'min_spend',
         'expired_date',
         't&c',
+        'is_active',
     ];
 
     public function shop()

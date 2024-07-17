@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_stamps', function (Blueprint $table) {
+        Schema::create('2in1stamps', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('stamp_id');
             $table->foreign('stamp_id')->references('id')->on('stamps');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->integer('is_used')->default(0)->comment('0 - No, 1 - Yes');
-            $table->integer('collected_stamp');
+            $table->unsignedBigInteger('second_stamp_id');
+            $table->foreign('second_stamp_id')->references('id')->on('stamps');
+            $table->integer('is_2in1stamp')->default(0)->comment('0 - No, 1 - Yes');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('table_user_stamp');
+        Schema::dropIfExists('2in1stamp');
     }
 };
