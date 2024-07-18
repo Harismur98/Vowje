@@ -9,6 +9,7 @@ use App\Models\Shops;
 use Illuminate\Http\JsonResponse;
 use App\Models\Credit;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ShopController extends Controller
 {
@@ -34,8 +35,9 @@ class ShopController extends Controller
     public function store(Request $request)
     {
         $userId = Auth::id();
+        Log::info("User ID $userId is attempting to create a shop.");
 
-        if(auth()->user()->role < 2 ){
+        if (auth()->user()->role < 2) {
 
             $fields = [
                 'name' => 'required|string',
@@ -48,16 +50,16 @@ class ShopController extends Controller
 
             // Check if validation fails
             if ($validator->fails()) {
+                Log::warning("Validation failed for user ID $userId: " . json_encode($validator->errors()));
                 return response()->json(['error' => $validator->errors()], 400);
             }
-    
+
             // Store the file in storage\app\public folder
             $file = $request->file('logo');
             $fileName = $file->getClientOriginalName();
             $filePath = $file->store('uploads', 'public');
-    
-            $userId = Auth::id();
-    
+            Log::info("File uploaded for user ID $userId: $fileName");
+
             $shop = Shops::create([
                 'user_id' => $userId,
                 'name' => $request['name'],
@@ -66,23 +68,25 @@ class ShopController extends Controller
                 'original_name' => $file->getClientOriginalName(),
                 'file_path' => $filePath,
             ]);
+            Log::info("Shop created for user ID $userId: Shop ID " . $shop->id);
 
             $credit = Credit::create([
                 'shop_id' => $shop->id,
                 'credit' => 0.0,
             ]);
-    
+            Log::info("Credit record created for shop ID " . $shop->id);
+
             $response = [
-                'message' => 'Successfully create shop',
+                'message' => 'Successfully created shop',
             ];
-    
+
             return response($response, 201);
-        }
-        else{
+        } else {
+            Log::warning("Unauthorized shop creation attempt by user ID $userId with role " . auth()->user()->role);
             $response = [
-                'message' => 'To register a shop please login using vendor account',
+                'message' => 'To register a shop please log in using a vendor account',
             ];
-            return response($response, 401);    
+            return response($response, 401);
         }
     }
 
