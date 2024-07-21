@@ -17,45 +17,49 @@ class MerchentController extends Controller
 {
     public function index()
     {
-
         $userId = Auth::id();
-
         $user = User::where('id', $userId)->first();
         $userName = $user->name;
         $unique_code = $user->unique_code;
         $shop = Shops::where('user_id', $userId)->first();
 
-        //if shop not found return 404 error
+        // If shop not found, return 404 error
         if (!$shop) {
             return response()->json(['error' => 'Shop not found'], 404);
-
         }
 
         $credit = Credit::where('shop_id', $shop->id)->first();
-        //get transaction for current month
         $month = date('m');
         $year = date('Y');
-        $transaction = Transaction::where('credit_id', $credit->id)
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)->get();
 
-        //get total amount from transaction
-        $total = 0;
-        foreach ($transaction as $item) {
-            $total += $item->amount;
-        }
-        //round to 2 decimal
-        $total = round($total, 2);
+        // Get transactions for the current month
+        $transactions = Transaction::where('credit_id', $credit->id)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->get();
+
+        // Filter transactions to get only top-up transactions
+        $topUpTransactions = $transactions->where('transaction_type', Transaction::TRANSACTION_TYPE_ADD);
+
+        // Calculate total amount for all transactions
+        $total = $transactions->sum('amount');
+
+        // Calculate total amount for top-up transactions
+        $topUpTotal = $topUpTransactions->sum('amount');
+
         $response = [
             'username' => $userName,
             'unique_code' => $unique_code,
             'credit' => $credit,
-            'transaction' => $transaction,
-            'total' => $total,
+            'transactions' => $transactions,
+            'total' => round($total, 2),
+            'top_up_total' => round($topUpTotal, 2),
+            'top_up_transactions' => $topUpTransactions
         ];
 
         return response()->json(['data' => $response], 200);
     }
+
 
     /**
      * Store a newly created resource in storage.
